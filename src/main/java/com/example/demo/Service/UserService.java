@@ -1,6 +1,4 @@
 package com.example.demo.Service;
-
-import com.example.demo.DTO.BookDTO;
 import com.example.demo.DTO.UserDTO;
 import com.example.demo.Entity.BookEntity;
 import com.example.demo.Permission;
@@ -12,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,21 +39,28 @@ public class UserService {
         return userRepository.existsByLogin(login);
     }
     public void addFavorites(final BookEntity book, final String login) {
-        Optional<UserEntity> optionalUser = getUserByLogin(login);
-        if (optionalUser.isPresent()) {
-            UserEntity user = optionalUser.get();
+        Optional<UserEntity> user = getUserByLogin(login);
+        if (user.isPresent()) {
+            UserEntity us = user.get();
             List<BookEntity> favorites = findFavorites(login);
             favorites.add(book);
-            user.setFavorites(favorites);
-            save(user);
+            us.setFavorites(favorites);
+            save(us);
         }
     }
-    public void deleteFavorites(final BookEntity book, final String login) {
+    public void deleteFavorites(final int id, final String login) {
         Optional<UserEntity> user = getUserByLogin(login);
         if (user.isPresent()) {
             UserEntity us = user.get();
             List<BookEntity> books = findFavorites(login);
-            books.remove(book);
+            System.out.println(books.size());
+            for (Iterator<BookEntity> it = books.iterator(); it.hasNext();) {
+                BookEntity s = it.next();
+
+                if (s.getId()==id){
+                    it.remove();
+                }
+            }
             us.setFavorites(books);
             save(us);
         }

@@ -18,13 +18,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.ok;
 @Controller
 public class UserController {
-//    @GetMapping({"/", ""})
-//    public String index(Model model) {
-//        if (DemoApplication.bookService.findAllBooks().size() > 0) {
-//            model.addAttribute("books", ModelAttribute.bookService.findAllBooks());
-//        }
-//        return "index";
-//    }
+
 @RequestMapping(value="/signup_page", method = RequestMethod.GET)
 public String getRegisterPage() {
     return "signup_page";
@@ -34,7 +28,7 @@ public String getRegisterPage() {
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ResponseEntity register(@RequestBody final UserDTO user) {
         if (DemoApplication.userService.userExists(user.getLogin())) {
-            return new ResponseEntity<>("Login already exists",
+            return new ResponseEntity<>("Username is taken.",
                     HttpStatus.FORBIDDEN);
         }
         String userPassword = user.getPassword();
@@ -69,7 +63,7 @@ public String getRegisterPage() {
     @RequestMapping(value = "/booklist/favorites/delete", method = RequestMethod.DELETE)
     public ResponseEntity deleteFavorites(final Principal principal, @RequestBody final BookDTO book) {
         String login = principal.getName();
-        DemoApplication.userService.deleteFavorites(BookEntity.builder().id(book.getId()).bookname(book.getName()).author(book.getAuthor()).isbn(book.getIsbn()).build(), login);
+        DemoApplication.userService.deleteFavorites(book.getId(), login);
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
@@ -79,7 +73,6 @@ public String getRegisterPage() {
             return ok(false);
         }
         boolean fav=DemoApplication.userService.isFavorite(id, principal.getName());
-        System.out.println("Is favorite  "+fav);
         return ok().body(fav);
     }
 }

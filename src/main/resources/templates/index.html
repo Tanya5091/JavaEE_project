@@ -68,7 +68,6 @@
                 success: function (response) {
 
                    var $table=$('#bookTable');
-                   console.log(response.name);
                     $table.append('<tr><td>' + response.name + '</td><td>' + response.isbn + '</td><td>' + response.author + '</td></tr>')
                 }
             });
@@ -120,7 +119,6 @@
                     var $table = $('#bookTable');
                     $table.empty();
                     response.forEach(function(book) {
-                        console.log(book);
                         $table.append('<tr><td>' + book.name + '</td><td>' + book.isbn + '</td><td>' + book.author + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
 
                     })
@@ -137,7 +135,6 @@
                     $table.empty();
                     response.forEach(function(book) {
                         $table.append('<tr><td>' + book.name + '</td><td>' + book.isbn + '</td><td>' + book.author + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
-
                     })
                 }
             });
