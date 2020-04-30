@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public String getRegisterPage() {
 
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public ResponseEntity register(@RequestBody final UserDTO user) {
+    public ResponseEntity register(@Valid @RequestBody final UserDTO user) {
         if (DemoApplication.userService.userExists(user.getLogin())) {
             return new ResponseEntity<>("Username is taken.",
                     HttpStatus.FORBIDDEN);
@@ -43,6 +44,7 @@ public String getRegisterPage() {
     @RequestMapping(value = "/booklist/favorites", method = RequestMethod.GET)
     public ResponseEntity<List<BookDTO>> getFavorites(final Principal principal) {
         String login = principal.getName();
+        System.out.println(DemoApplication.userService.getUserByLogin(principal.getName()).get().getPermissions());
         List<BookEntity> favorites = DemoApplication.userService.findFavorites(login);
         List<BookDTO> response = new ArrayList<>();
         for( BookEntity b : favorites)

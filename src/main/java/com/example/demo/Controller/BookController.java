@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,16 +27,10 @@ public class BookController {
         if(value==null)
         {
            list = DemoApplication.bookService.getAllBooks();
-            System.out.println();
-            System.out.println();
-            System.out.println(list.size());
-            System.out.println();
-            System.out.println();
         }
         else{
 
             int x=Integer.parseInt(type);
-            System.out.println(x);
             if(x==0)
                 list = DemoApplication.bookService.findByName(value);
             else if (x==1)
@@ -72,13 +67,12 @@ res.get(res.size()-1).getName();
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/booklist", method = RequestMethod.POST)
-    public ResponseEntity<BookDTO> formControllerPost(@RequestBody final BookDTO book) {
+    public ResponseEntity<BookDTO> formControllerPost(@Valid @RequestBody final BookDTO book) {
         BookEntity ben = new BookEntity();
         ben.setBookname(book.getName());
         ben.setAuthor(book.getAuthor());
         ben.setIsbn(book.getIsbn());
        BookEntity b= DemoApplication.bookService.createBook(ben);
-        System.out.println(b);
         return new ResponseEntity<>(book, HttpStatus.CREATED);
     }
 

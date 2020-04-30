@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>BookPage</title>
@@ -67,7 +67,7 @@ Book author:&nbsp<th:block th:text= "${book.author}"/>
                 window.location.reload();
             }
         });
-    };
+    }
     function deleteFav() {
         $.ajax({
             type: 'DELETE',
@@ -85,7 +85,7 @@ Book author:&nbsp<th:block th:text= "${book.author}"/>
                 window.location.reload();
             }
         });
-    };
+    }
 </script>
 </body>
 </html>

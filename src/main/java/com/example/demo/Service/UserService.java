@@ -21,23 +21,32 @@ public class UserService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final PermissionRepository permissionRepository;
-    public UserEntity save(final UserEntity user) {return userRepository.save(user);}
 
-    public UserEntity registerUser(UserDTO user )
-    {
+    public UserEntity save(final UserEntity user) {
+        return userRepository.save(user);
+    }
+
+    public UserEntity registerUser(UserDTO user) {
         return save(UserEntity.builder()
                 .login(user.getLogin())
                 .password(user.getPassword())
                 .permissions(Collections.singletonList(permissionRepository.findByPermission(Permission.USER))).build());
     }
-    public Optional<UserEntity> getUserByLogin(String log)
-    {
+    public UserEntity registerAdmin(UserDTO user) {
+        return save(UserEntity.builder()
+                .login(user.getLogin())
+                .password(user.getPassword())
+                .permissions(Collections.singletonList(permissionRepository.findByPermission(Permission.ADMIN))).build());
+    }
+
+    public Optional<UserEntity> getUserByLogin(String log) {
         return userRepository.findByLogin(log);
     }
-    public boolean userExists(final String login)
-    {
+
+    public boolean userExists(final String login) {
         return userRepository.existsByLogin(login);
     }
+
     public void addFavorites(final BookEntity book, final String login) {
         Optional<UserEntity> user = getUserByLogin(login);
         if (user.isPresent()) {
@@ -48,16 +57,17 @@ public class UserService {
             save(us);
         }
     }
+
     public void deleteFavorites(final int id, final String login) {
         Optional<UserEntity> user = getUserByLogin(login);
         if (user.isPresent()) {
             UserEntity us = user.get();
             List<BookEntity> books = findFavorites(login);
             System.out.println(books.size());
-            for (Iterator<BookEntity> it = books.iterator(); it.hasNext();) {
+            for (Iterator<BookEntity> it = books.iterator(); it.hasNext(); ) {
                 BookEntity s = it.next();
 
-                if (s.getId()==id){
+                if (s.getId() == id) {
                     it.remove();
                 }
             }
@@ -69,15 +79,14 @@ public class UserService {
     public List<BookEntity> findFavorites(String login) {
         return bookRepository.findFavoritesForUser(login);
     }
-    public boolean isFavorite(int id, String login)
-    {
+
+    public boolean isFavorite(int id, String login) {
         List<BookEntity> favorites = findFavorites(login);
-        for(BookEntity b : favorites)
-        {
-            if (b.getId()==id)
+        for (BookEntity b : favorites) {
+            if (b.getId() == id)
                 return true;
         }
-      return false;
+        return false;
     }
 
 }

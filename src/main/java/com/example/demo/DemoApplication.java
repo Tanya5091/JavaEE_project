@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.DTO.UserDTO;
 import com.example.demo.Service.BookService;
 import com.example.demo.Service.PermissionService;
 import com.example.demo.Service.UserService;
@@ -18,6 +19,9 @@ static PermissionService permissionService;
          userService = applicationContext.getBean(UserService.class);
          permissionService = applicationContext.getBean(PermissionService.class);
 
+
+//      Credentials for ADMIN!!!!!
+//         userService.registerAdmin(new UserDTO("adminer","admin1234"));
        }
 
 }

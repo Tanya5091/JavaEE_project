@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Index</title>
@@ -19,6 +19,7 @@
     <input name="author" placeholder="Author">
     <br>
     <button type="submit">Add Book</button>
+    <div id="message"></div>
 </form>
 <form  id="filterForm">
     <br>
@@ -69,6 +70,13 @@
 
                    var $table=$('#bookTable');
                     $table.append('<tr><td>' + response.name + '</td><td>' + response.isbn + '</td><td>' + response.author + '</td></tr>')
+                },
+                error: function (response) {
+                    var err = "";
+                    $.each(response.responseJSON, function (id, error) {
+                        err = err + error+". ";
+                    });
+                    $('#message').html(err);
                 }
             });
         });
