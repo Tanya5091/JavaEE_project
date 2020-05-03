@@ -1,57 +1,82 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Index</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style>
+        .mym {
+            margin-right: 10px;
+        }
+
+        .m {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <button id="login" th:if="${#authorization.expression('!isAuthenticated()')}">Sign In</button>
-    <button id="signup" th:if="${#authorization.expression('!isAuthenticated()')}">Sign Up</button>
-    <button id="logout" th:if="${#authorization.expression('isAuthenticated()')}">Sign Out</button>
-<form id="addForm" th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}">
-    Add book
-    <br>
-    <input name="bookname" placeholder="Name">
-    <br />
-    <input name="isbn" placeholder="ISBN">
-    <br />
-    <input name="author" placeholder="Author">
-    <br>
-    <button type="submit">Add Book</button>
-    <div id="message"></div>
-</form>
-<form  id="filterForm">
-    <br>
-    Filter
-    <br>
-    <input name="val" placeholder="Value">
-    <br>
-    <select name="typ">
-        <option value='0'> Name</option>
-        <option value='1' > ISBN</option>
-        <option value='2'> Author</option>
-        <option value='3'> Name&ISBN</option>
-    </select>
-    <br>
-<button type="submit">Filter</button>
-    <br>
-</form>
-<button id="getFavorites"   th:if="${#authorization.expression('isAuthenticated()')}">Get Favorite Books</button>
-<button id="getAll">Get All Books</button>
-<table border="1" width="100%">
-    <thead>
-    <td>Bookname</td>
-    <td>Author</td>
-    <td>ISBN</td>
-    <td>Details</td>
-    </thead>
-   <tbody id="bookTable"></tbody>
-</table>
+<nav class="navbar navbar-expand-lg navbar-light bg-light ">
+    <div class="d-flex flex-row-reverse" style="width: 100%;">
+        <button id="login" class="btn mym " th:if="${#authorization.expression('!isAuthenticated()')}">Sign In</button>
+        <button id="signup" class="btn mym " th:if="${#authorization.expression('!isAuthenticated()')}">Sign Up</button>
+        <button id="logout" class="btn mym " th:if="${#authorization.expression('isAuthenticated()')}">Sign Out</button>
+    </div>
+</nav>
+<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
+<div style="margin: 20px">
+    <form style="width: 50%;" id="addForm" th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}">
+        <div class="form-group">
+            <p>Add book</p>
+            <input name="bookname" class="m form-control" placeholder="Name">
+            <input name="isbn" class="m form-control" placeholder="ISBN">
+            <input name="author" class="m form-control" placeholder="Author">
+            <div style="width: 100%;" class="d-flex flex-row-reverse">
+                <button type="submit" class="m btn mym ">Add Book</button>
+            </div>
+            <div id="message"></div>
+        </div>
+    </form>
+    <form id="filterForm" style="width: 50%;" class="m form-inline">
+
+        <p class="mym m">Filter</p>
+            <input name="val" class="mym form-control" placeholder="Value">
+            <select name="typ" class="mym form-control">
+                <option value='0'> Name</option>
+                <option value='1'> ISBN</option>
+                <option value='2'> Author</option>
+                <option value='3'> Name&ISBN</option>
+            </select>
+
+                <button type="submit" class="btn mym ">Filter</button>
+
+
+    </form>
+    <div class="m">
+    <button id="getFavorites" class="btn" th:if="${#authorization.expression('isAuthenticated()')}">Get Favorite Books</button>
+    <button id="getAll" class="btn">Get All Books</button>
+    </div>
+</div>
+<div style="margin: 20px">
+    <table width="70%" class="table table-bordered">
+        <thead>
+        <td>Bookname</td>
+        <td>Author</td>
+        <td>ISBN</td>
+        <td>Details</td>
+        </thead>
+        <tbody id="bookTable"></tbody>
+    </table>
+</div>
 <br>
 <script>
-    $(function(){
-        $('#addForm').submit(function(e){
+    $(function () {
+        $('#addForm').submit(function (e) {
             e.preventDefault();
 
             $.ajax({
@@ -63,24 +88,24 @@
                     isbn: $(this).find('[name=isbn]').val(),
                     author: $(this).find('[name=author]').val()
                 }),
-                beforeSend: function(xhr) {
+                beforeSend: function (xhr) {
                     xhr.setRequestHeader('Content-Type', 'application/json')
                 },
                 success: function (response) {
 
-                   var $table=$('#bookTable');
+                    var $table = $('#bookTable');
                     $table.append('<tr><td>' + response.name + '</td><td>' + response.author + '</td><td>' + response.isbn + '</td></tr>')
                 },
                 error: function (response) {
                     var err = "";
                     $.each(response.responseJSON, function (id, error) {
-                        err = err + error+". ";
+                        err = err + error + ". ";
                     });
                     $('#message').html(err);
                 }
             });
         });
-        $('#filterForm').submit(function(e) {
+        $('#filterForm').submit(function (e) {
             e.preventDefault();
 
             $.ajax({
@@ -94,14 +119,14 @@
                 success: function (response) {
                     var $books = $('#bookTable');
                     $books.empty();
-                    response.forEach(function(book) {
+                    response.forEach(function (book) {
                         $books.append('<tr><td>' + book.name + '</td><td>' + book.author + '</td><td>' + book.isbn + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
 
                     })
                 }
             });
         });
-        $(function() {
+        $(function () {
             $(document).ready(function () {
                 $.ajax({
                     type: 'GET',
@@ -110,15 +135,15 @@
                         var $table = $('#bookTable');
                         $table.empty();
                         response.forEach(function (book) {
-                            $table.append('<tr><td>' + book.name + '</td><td>' + book.author + '</td><td>' + book.isbn + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
+                                $table.append('<tr><td>' + book.name + '</td><td>' + book.author + '</td><td>' + book.isbn + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
 
-                        }
+                            }
                         )
                     }
                 });
             });
         });
-        $('#getAll').click(function(){
+        $('#getAll').click(function () {
 
             $.ajax({
                 type: 'GET',
@@ -126,14 +151,14 @@
                 success: function (response) {
                     var $table = $('#bookTable');
                     $table.empty();
-                    response.forEach(function(book) {
+                    response.forEach(function (book) {
                         $table.append('<tr><td>' + book.name + '</td><td>' + book.author + '</td><td>' + book.isbn + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
 
                     })
                 }
             });
         });
-        $('#getFavorites').click(function(){
+        $('#getFavorites').click(function () {
 
             $.ajax({
                 type: 'GET',
@@ -141,7 +166,7 @@
                 success: function (response) {
                     var $table = $('#bookTable');
                     $table.empty();
-                    response.forEach(function(book) {
+                    response.forEach(function (book) {
                         $table.append('<tr><td>' + book.name + '</td><td>' + book.author + '</td><td>' + book.isbn + '</td><td><a href=\"/book_page/' + book.id + '\">Details</a></tr>');
                     })
                 }
