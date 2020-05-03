@@ -1,9 +1,11 @@
 package com.example.demo.Service;
 import com.example.demo.DTO.UserDTO;
 import com.example.demo.Entity.BookEntity;
+import com.example.demo.Entity.CommentEntity;
 import com.example.demo.Permission;
 import com.example.demo.Entity.UserEntity;
 import com.example.demo.Repository.BookRepository;
+import com.example.demo.Repository.CommentRepository;
 import com.example.demo.Repository.PermissionRepository;
 import com.example.demo.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final CommentRepository commentRepository;
     private final PermissionRepository permissionRepository;
 
     public UserEntity save(final UserEntity user) {
@@ -57,6 +60,16 @@ public class UserService {
             save(us);
         }
     }
+    public void addComment(final CommentEntity comment, final String login) {
+        Optional<UserEntity> user = getUserByLogin(login);
+        if (user.isPresent()) {
+            UserEntity us = user.get();
+            List<CommentEntity> comments = findComments(login);
+            comments.add(comment);
+            us.setComments(comments);
+            save(us);
+        }
+    }
 
     public void deleteFavorites(final int id, final String login) {
         Optional<UserEntity> user = getUserByLogin(login);
@@ -78,6 +91,10 @@ public class UserService {
 
     public List<BookEntity> findFavorites(String login) {
         return bookRepository.findFavoritesForUser(login);
+    }
+
+    public List<CommentEntity> findComments(String login) {
+        return commentRepository.findCommentsForUser(login);
     }
 
     public boolean isFavorite(int id, String login) {

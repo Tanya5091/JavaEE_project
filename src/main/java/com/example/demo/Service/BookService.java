@@ -1,11 +1,14 @@
 package com.example.demo.Service;
 
 import com.example.demo.Entity.BookEntity;
+import com.example.demo.Entity.CommentEntity;
 import com.example.demo.Repository.BookRepository;
+import com.example.demo.Repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.xml.stream.events.Comment;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +17,7 @@ import java.util.Optional;
 public class BookService {
 
     private final BookRepository rep;
+    private final CommentRepository commentRepository;
     @Transactional
     public BookEntity createBook(final BookEntity book) {
         return rep.saveAndFlush(book);
@@ -46,6 +50,9 @@ public class BookService {
     public BookEntity getBookById(int id) {
         return rep.findById(id).orElse(null);
 
+    }
+    public List<CommentEntity> findComments(int id) {
+        return commentRepository.findCommentsForBook(id);
     }
 
 }

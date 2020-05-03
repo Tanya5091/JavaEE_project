@@ -41,4 +41,10 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )    private List<BookEntity> favorites;
 
+    @OneToMany
+    @JoinTable(
+            name = "users_to_comments",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )    private List<CommentEntity> comments;
 }

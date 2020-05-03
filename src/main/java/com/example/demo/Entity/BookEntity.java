@@ -42,7 +42,7 @@ public class BookEntity
     @OneToMany
     @JoinTable(
             name = "books_to_comments",
-            joinColumns = @JoinColumn(name = "comment_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
     )    private List<CommentEntity> comments;
 }

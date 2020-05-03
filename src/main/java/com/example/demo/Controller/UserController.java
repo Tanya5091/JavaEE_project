@@ -1,9 +1,11 @@
 package com.example.demo.Controller;
 
 import com.example.demo.DTO.BookDTO;
+import com.example.demo.DTO.CommentDTO;
 import com.example.demo.DTO.UserDTO;
 import com.example.demo.DemoApplication;
 import com.example.demo.Entity.BookEntity;
+import com.example.demo.Entity.CommentEntity;
 import com.example.demo.MyPasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,22 @@ public String getRegisterPage() {
         String login = principal.getName();
         DemoApplication.userService.addFavorites(BookEntity.builder().id(book.getId()).bookname(book.getName()).author(book.getAuthor()).isbn(book.getIsbn()).build(), login);
         return new ResponseEntity(HttpStatus.ACCEPTED);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @RequestMapping(value = "/bookpage/сomment/add", method = RequestMethod.POST)
+    public ResponseEntity addComment(final Principal principal, @RequestBody final CommentDTO comment) {
+        String login = principal.getName();
+        CommentEntity commentEntity = new CommentEntity();
+        BookDTO book = comment.getBook();
+
+        commentEntity.setBook(BookEntity.builder().id(book.getId()).bookname(book.getName()).author(book.getAuthor()).isbn(book.getIsbn()).build());
+        commentEntity.setStars(comment.getStars());
+        commentEntity.setText(comment.getText());
+        commentEntity.setUser(DemoApplication.userService.getUserByLogin(login).get());
+        CommentEntity c =DemoApplication.commentService.createComment(commentEntity);
+        System.out.println(c.getText());
+       return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
     @PreAuthorize("hasAuthority('USER')")
