@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 public class UserDTO {
 
     @NotEmpty(message = "Login can`t be empty")
-    @Pattern(regexp = "[A-Za-z0-9]", message ="Only latin characters and digits are allowed")
+    @Pattern(regexp = "^[a-zA-Z0-9]*$", message ="Only latin characters and digits are allowed")
     private String login;
 
 
