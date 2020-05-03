@@ -19,7 +19,6 @@ static PermissionService permissionService;
          userService = applicationContext.getBean(UserService.class);
          permissionService = applicationContext.getBean(PermissionService.class);
 
-
 //      Credentials for ADMIN!!!!!
 //         userService.registerAdmin(new UserDTO("adminer","admin1234"));
        }
