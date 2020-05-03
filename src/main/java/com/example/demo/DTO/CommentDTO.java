@@ -11,4 +11,5 @@ public class CommentDTO {
     private String text;
     private Integer stars;
     private BookDTO book;
+    private String user;
 }
