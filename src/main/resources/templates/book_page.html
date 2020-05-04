@@ -58,165 +58,170 @@
     </div>
 
     <div style="margin-top: 20px">
-        <form id="addComment" class="form-inline" th:if="${#authorization.expression('isAuthenticated()')}">
-            <div id="buttons">
-            </div>
-            <input name="comm" class="mym m form-control" placeholder="Comment">
-            <select name="rat" class="mym m form-control">
-                <option value='1'> 1</option>
-                <option value='2'> 2</option>
-                <option value='3'> 3</option>
-                <option value='4'> 4</option>
-                <option value='5'> 5</option>
-            </select>
-            <button type="submit" class="btn m">Submit</button>
-        </form>
+        <div style="margin-top: 20px">
+            <form th:if="${#authorization.expression('isAuthenticated()')}">
+                <div id="buttons">
+                </div>
+                <br>
+            </form>
+            <form id="addComment" class="form-inline" th:if="${#authorization.expression('isAuthenticated()')}">
 
+                <input name="comm" class="mym m form-control" placeholder="Comment">
+                <select name="rat" class="mym m form-control">
+                    <option value='1'> 1</option>
+                    <option value='2'> 2</option>
+                    <option value='3'> 3</option>
+                    <option value='4'> 4</option>
+                    <option value='5'> 5</option>
+                </select>
+                <button type="submit" class="btn m">Submit</button>
+            </form>
+
+        </div>
+        <div id="comments" style="margin-top: 20px">
+            <table width="70%" class="table table-bordered">
+                <thead>
+                <td>User</td>
+                <td>Оцінка</td>
+                <td>Відгук</td>
+                </thead>
+                <tbody id="commentsTable"></tbody>
+            </table>
+        </div>
     </div>
-    <div id="comments" style="margin-top: 20px">
-        <table width="70%" class="table table-bordered">
-            <thead>
-            <td>User</td>
-            <td>Оцінка</td>
-            <td>Відгук</td>
-            </thead>
-            <tbody id="commentsTable"></tbody>
-        </table>
-    </div>
-</div>
 
-<script>
-    var bookId, bookname, author, isbn, res = 0, reviews = 0;
+    <script>
+        var bookId, bookname, author, isbn, res = 0, reviews = 0;
 
-    $(function () {
-        $(document).ready(function () {
-            var path = window.location.pathname;
-            bookId = path.substring(path.lastIndexOf('/') + 1);
-            $.ajax({
-                type: 'GET',
-                url: '/booklist/isFavorite/' + bookId,
-                success: function (response) {
-                    var $buttons = $('#buttons');
-                    if (response) {
+        $(function () {
+            $(document).ready(function () {
+                var path = window.location.pathname;
+                bookId = path.substring(path.lastIndexOf('/') + 1);
+                $.ajax({
+                    type: 'GET',
+                    url: '/booklist/isFavorite/' + bookId,
+                    success: function (response) {
+                        var $buttons = $('#buttons');
+                        if (response) {
 
-                        $buttons.append('<button  class="btn m" th:if="${#authorization.expression(\'hasAuthority(\'\'USER\'\')\')}" onclick=' + "\"deleteFav()\"" + '>Delete from Favorites</button>');
-                    }
-                    else {
-                        console.log("NOT FAVORITE")
-                        $buttons.append('<button  class="btn m" th:if="${#authorization.expression(\'hasAuthority(\'\'USER\'\')\')}" onclick=' + "\"addFav()\"" + '>Add to Favorites</button>');
-                    }
-                }
-            });
-            $.ajax({
-                type: 'GET',
-                url: '/bookpage/' + bookId,
-                success: function (response) {
-                    bookname = response.bookname;
-                    author = response.author;
-                    isbn = response.isbn;
-                }
-            });
-            $.ajax({
-                type: 'GET',
-                url: 'comments/' + bookId,
-                success: function (response) {
-                    var $table = $('#commentsTable');
-                    $table.empty();
-                    reviews = 0;
-                    res = 0;
-                    response.forEach(function (comment) {
-                            reviews++;
-                            res += comment.stars;
-
-                            $table.append('<tr><td>' + comment.user + '</td><td>' + comment.stars + '</td><td>' + comment.text + '</td></tr>');
+                            $buttons.append('<button  class="btn m" th:if="${#authorization.expression(\'hasAuthority(\'\'USER\'\')\')}" onclick=' + "\"deleteFav()\"" + '>Delete from Favorites</button>');
                         }
-                    )
-                    if (response.length < 1) {
-                        res = 0;
+                        else {
+                            console.log("NOT FAVORITE")
+                            $buttons.append('<button  class="btn m" th:if="${#authorization.expression(\'hasAuthority(\'\'USER\'\')\')}" onclick=' + "\"addFav()\"" + '>Add to Favorites</button>');
+                        }
                     }
-                    else
-                        res = Math.round(res / reviews * 10) / 10;
+                });
+                $.ajax({
+                    type: 'GET',
+                    url: '/bookpage/' + bookId,
+                    success: function (response) {
+                        bookname = response.bookname;
+                        author = response.author;
+                        isbn = response.isbn;
+                    }
+                });
+                $.ajax({
+                    type: 'GET',
+                    url: 'comments/' + bookId,
+                    success: function (response) {
+                        var $table = $('#commentsTable');
+                        $table.empty();
+                        reviews = 0;
+                        res = 0;
+                        response.forEach(function (comment) {
+                                reviews++;
+                                res += comment.stars;
+
+                                $table.append('<tr><td>' + comment.user + '</td><td>' + comment.stars + '</td><td>' + comment.text + '</td></tr>');
+                            }
+                        )
+                        if (response.length < 1) {
+                            res = 0;
+                        }
+                        else
+                            res = Math.round(res / reviews * 10) / 10;
+                        $('#stars').text(res + "/5");
+                    }
+                });
+            });
+
+        });
+
+
+        function addFav() {
+            $.ajax({
+                type: 'PUT',
+                url: '/booklist/favorites/add',
+                data: JSON.stringify({
+                    id: bookId,
+                    name: bookname,
+                    author: author,
+                    isbn: isbn
+                }),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            });
+        }
+
+        function deleteFav() {
+            $.ajax({
+                type: 'DELETE',
+                url: '/booklist/favorites/delete',
+                data: JSON.stringify({
+                    id: bookId,
+                    name: bookname,
+                    author: author,
+                    isbn: isbn
+                }),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: function () {
+                    window.location.reload();
+                }
+            });
+        }
+
+        $('#addComment').submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: 'POST',
+                url: '/booklist/comments/add',
+                dataType: 'json',
+                data: JSON.stringify({
+                    text: $(this).find('[name=comm]').val(),
+                    stars: $(this).find('[name=rat]').val(),
+                    book: bookId
+                }),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json')
+                },
+                success: function (comment) {
+                    var $table = $('#commentsTable');
+                    reviews++;
+                    var dif = comment.stars - res;
+                    res += dif / reviews;
+                    res = Math.round(res * 10) / 10;
+                    $table.append('<tr><td>' + comment.user + '</td><td>' + comment.stars + '</td><td>' + comment.text + '</td></tr>');
                     $('#stars').text(res + "/5");
                 }
             });
         });
-
-    });
-
-
-    function addFav() {
-        $.ajax({
-            type: 'PUT',
-            url: '/booklist/favorites/add',
-            data: JSON.stringify({
-                id: bookId,
-                name: bookname,
-                author: author,
-                isbn: isbn
-            }),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Content-Type', 'application/json')
-            },
-            success: function () {
-                window.location.reload();
-            }
+        $('#signup').click(function () {
+            location.href = "https://javaeeproject.herokuapp.com/signup_page";
         });
-    }
-
-    function deleteFav() {
-        $.ajax({
-            type: 'DELETE',
-            url: '/booklist/favorites/delete',
-            data: JSON.stringify({
-                id: bookId,
-                name: bookname,
-                author: author,
-                isbn: isbn
-            }),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Content-Type', 'application/json')
-            },
-            success: function () {
-                window.location.reload();
-            }
+        $('#login').click(function () {
+            location.href = "https://javaeeproject.herokuapp.com/login";
         });
-    }
-
-    $('#addComment').submit(function (e) {
-        e.preventDefault();
-
-        $.ajax({
-            type: 'POST',
-            url: '/booklist/comments/add',
-            dataType: 'json',
-            data: JSON.stringify({
-                text: $(this).find('[name=comm]').val(),
-                stars: $(this).find('[name=rat]').val(),
-                book: bookId
-            }),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Content-Type', 'application/json')
-            },
-            success: function (comment) {
-                var $table = $('#commentsTable');
-                reviews++;
-                var dif = comment.stars - res;
-                res += dif / reviews;
-                res = Math.round(res * 10) / 10;
-                $table.append('<tr><td>' + comment.user + '</td><td>' + comment.stars + '</td><td>' + comment.text + '</td></tr>');
-                $('#stars').text(res + "/5");
-            }
+        $('#logout').click(function () {
+            location.href = "https://javaeeproject.herokuapp.com/logout";
         });
-    });
-    $('#signup').click(function () {
-        location.href = "https://javaeeproject.herokuapp.com/signup_page";
-    });
-    $('#login').click(function () {
-        location.href = "https://javaeeproject.herokuapp.com/login";
-    });
-    $('#logout').click(function () {
-        location.href = "https://javaeeproject.herokuapp.com/logout";
-    });
-</script>
+    </script>
 </body>
 </html>
