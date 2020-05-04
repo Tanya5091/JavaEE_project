@@ -29,6 +29,7 @@ public class CommentEntity {
             joinColumns = @JoinColumn(name = "comment_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )    private UserEntity user;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(
             name = "books_to_comments",

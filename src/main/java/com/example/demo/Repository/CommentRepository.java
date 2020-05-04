@@ -13,7 +13,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Integer>
     @Query("SELECT comment FROM CommentEntity comment "
             + "JOIN comment.user user "
             + "WHERE user.login = :login")
-    List<CommentEntity> findCommentsForUser(@Param("login") final BookEntity book);
+    List<CommentEntity> findCommentsForUser(@Param("login") final String login);
     @Query("SELECT comment FROM CommentEntity comment "
             + "JOIN comment.book book "
             + "WHERE book.id= :id")

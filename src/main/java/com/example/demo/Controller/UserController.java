@@ -63,21 +63,7 @@ public String getRegisterPage() {
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
-    @PreAuthorize("hasAuthority('USER')")
-    @RequestMapping(value = "/bookpage/сomment/add", method = RequestMethod.POST)
-    public ResponseEntity addComment(final Principal principal, @RequestBody final CommentDTO comment) {
-        String login = principal.getName();
-        CommentEntity commentEntity = new CommentEntity();
-        BookDTO book = comment.getBook();
 
-        commentEntity.setBook(BookEntity.builder().id(book.getId()).bookname(book.getName()).author(book.getAuthor()).isbn(book.getIsbn()).build());
-        commentEntity.setStars(comment.getStars());
-        commentEntity.setText(comment.getText());
-        commentEntity.setUser(DemoApplication.userService.getUserByLogin(login).get());
-        CommentEntity c =DemoApplication.commentService.createComment(commentEntity);
-        System.out.println(c.getText());
-       return new ResponseEntity(HttpStatus.ACCEPTED);
-    }
 
     @PreAuthorize("hasAuthority('USER')")
     @RequestMapping(value = "/booklist/favorites/delete", method = RequestMethod.DELETE)

@@ -1,8 +1,10 @@
 package com.example.demo.Controller;
 
 import com.example.demo.DTO.BookDTO;
+import com.example.demo.DTO.CommentDTO;
 import com.example.demo.DemoApplication;
 import com.example.demo.Entity.BookEntity;
+import com.example.demo.Entity.CommentEntity;
 import com.example.demo.Entity.UserEntity;
 import com.example.demo.MyPasswordEncoder;
 import com.example.demo.Service.MyUserDetailsService;
@@ -14,8 +16,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.xml.stream.events.Comment;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
 public class BookController {
@@ -65,6 +71,17 @@ res.get(res.size()-1).getName();
         return "book_page";
     }
 
+    @GetMapping("/book_page/comments/{id}")
+    public ResponseEntity<List<CommentDTO>> getBookComments(@PathVariable("id") Integer id) {
+        List<CommentEntity> favorites = DemoApplication.bookService.findComments(id);
+        List<CommentDTO> response = new ArrayList<>();
+        for( CommentEntity b : favorites)
+        {
+            response.add(new CommentDTO(b.getText(), b.getStars(), b.getBook().getId(), b.getUser().getLogin()));
+        }
+        return ok(response);
+    }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/booklist", method = RequestMethod.POST)
     public ResponseEntity<BookDTO> formControllerPost(@Valid @RequestBody final BookDTO book) {
@@ -76,6 +93,26 @@ res.get(res.size()-1).getName();
         return new ResponseEntity<>(book, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAuthority('USER')")
+    @RequestMapping(value = "/booklist/comments/add", method = RequestMethod.POST)
+    public ResponseEntity<CommentDTO> addComment(final Principal principal, @RequestBody final CommentDTO comment) {
+        System.out.println(comment.getText());
+        String login = principal.getName();
+        CommentEntity commentEntity = new CommentEntity();
+        BookEntity book = DemoApplication.bookService.getBookById(comment.getBook());
+        commentEntity.setBook(book);
+        // commentEntity.setBook(BookEntity.builder().id(book.getId()).bookname(book.getName()).author(book.getAuthor()).isbn(book.getIsbn()).build());
+        commentEntity.setStars(comment.getStars());
+        commentEntity.setText(comment.getText());
+        commentEntity.setUser(DemoApplication.userService.getUserByLogin(login).get());
+        CommentEntity c =DemoApplication.commentService.createComment(commentEntity);
+        System.out.println(c.getStars());
+        CommentDTO com = new CommentDTO();
+        com.setText(c.getText());
+        com.setStars(c.getStars());
+        com.setUser(login);
+        return new ResponseEntity<>(com, HttpStatus.CREATED);
+    }
 
 
 }

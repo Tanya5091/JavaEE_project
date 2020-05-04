@@ -13,6 +13,7 @@
 </head>
 <body>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
 <div class="container" style="margin-top: 50px">
     <div class="row">
         <div class="col-md-5 mx-auto">
@@ -32,18 +33,18 @@
                     Book author:&nbsp
                     <th:block th:text="${book.author}"/>
                     <br/>
-                    <div id="buttons" th:if="${#authorization.expression('hasAuthority(''USER'')')}">
-                        <div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>
 
 
     </div>
-    <div  style="margin-top: 20px">
-        <form id="add-comment" class="form-inline">
+
+    <div  style="margin-top: 20px" >
+        <form id="addComment" class="form-inline"  th:if="${#authorization.expression('isAuthenticated()')}">
+            <div id="buttons" >
+            </div><br>
             <input name="comm" class="mym m form-control" placeholder="Comment">
             <select name="rat" class="mym m form-control">
                 <option value='1'> 1 </option>
@@ -54,6 +55,7 @@
             </select>
             <button type="submit" class="btn m">Submit</button>
         </form>
+
     </div>
     <div id="comments" style="margin-top: 20px">
         <table width="70%" class="table table-bordered">
@@ -68,7 +70,7 @@
 </div>
 
 <script>
-    var bookId, bookname, author, isbn;
+    var bookId, bookname, author, isbn, res=0, reviews=0;
 
     $(function () {
         $(document).ready(function () {
@@ -80,10 +82,12 @@
                 success: function (response) {
                     var $buttons = $('#buttons');
                     if (response) {
-                        $buttons.append('<button onclick=' + "\"deleteFav()\"" + '>Delete from Favorites</button>');
+
+                        $buttons.append('<button  class="btn m" th:if="${#authorization.expression(\'hasAuthority(\'\'USER\'\')\')}" onclick=' + "\"deleteFav()\"" + '>Delete from Favorites</button>');
                     }
                     else {
-                        $buttons.append('<button onclick=' + "\"addFav()\"" + '>Add to Favorites</button>');
+                        console.log("NOT FAVORITE")
+                        $buttons.append('<button  class="btn m" th:if="${#authorization.expression(\'hasAuthority(\'\'USER\'\')\')}" onclick=' + "\"addFav()\"" + '>Add to Favorites</button>');
                     }
                 }
             });
@@ -96,51 +100,32 @@
                     isbn = response.isbn;
                 }
             });
-        });
-
-    });
-    $(function () {
-        $(document).ready(function () {
             $.ajax({
                 type: 'GET',
-                url: 'comments',
+                url: 'comments/'+bookId,
                 success: function (response) {
                     var $table = $('#commentsTable');
                     $table.empty();
+                    reviews=0;
+                    res=0;
                     response.forEach(function (comment) {
+                        reviews++;
+                        res+=comment.stars;
+
                             $table.append('<tr><td>' + comment.user  + '</td><td>' + comment.stars + '</td><td>' +comment.text + '</td></tr>');
                         }
                     )
-                }
-            });
-        });
-    });
-
-    $(function () {
-        $(document).ready(function () {
-            $.ajax({
-                type: 'GET',
-                url: '/comments',
-                success: function (response) {
-
-                    var res = 0;
-                    var i =0;
-
-                    response.forEach(function (comm) {
-                            res+=comm.rating;
-                            i++;
-                        }
-                    )
-                    res=res/i;
+                    if(response.length<1){
+                        res=0;
+                    }
+                    else
+                    res=Math.round(res/reviews*10)/10;
                     $('#stars').text(res+"/5");
-                },
-                error: function (response) {
-                    $('#stars').text("Немає жодної оцінки");
                 }
             });
         });
-    });
 
+    });
 
 
     function addFav() {
@@ -180,35 +165,33 @@
             }
         });
     }
-    $('#add-comment').submit(function (e) {
+    $('#addComment').submit(function (e) {
         e.preventDefault();
 
         $.ajax({
             type: 'POST',
-            url: '/comments/add',
+            url: '/booklist/comments/add',
             dataType: 'json',
-            data: {
+            data: JSON.stringify({
                 text: $(this).find('[name=comm]').val(),
                 stars: $(this).find('[name=rat]').val(),
-                book: bookname
+                book: bookId
+            }),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Content-Type', 'application/json')
             },
-            success: function (response) {
+            success: function (comment) {
                 var $table = $('#commentsTable');
-                $table.empty();
-                var res = 0;
-                var i =0;
-
-                response.forEach(function (comment) {
-                        $table.append('<tr><td>' + comment.user  + '</td><td>' + comment.rating + '</td><td>' +comment.text + '</td></tr>');
-                    i++;
-                    res+=comment.rating;
-                }
-                );
-                res=res/i;
+                reviews++;
+                var dif = comment.stars-res;
+                res+=dif/reviews;
+                res=Math.round(res*10)/10;
+                $table.append('<tr><td>' + comment.user  + '</td><td>' + comment.stars + '</td><td>' +comment.text + '</td></tr>');
                 $('#stars').text(res+"/5");
             }
         });
     });
+
 </script>
 </body>
 </html>

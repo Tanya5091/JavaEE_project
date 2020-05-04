@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class CommentDTO {
     private String text;
     private Integer stars;
-    private BookDTO book;
+    private int book;
     private String user;
 }
