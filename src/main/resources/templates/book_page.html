@@ -9,15 +9,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
- <style>
-     .mym {
-         margin-right: 10px;
-     }
+    <style>
+        .mym {
+            margin-right: 10px;
+        }
 
-     .m {
-         margin-top: 10px;
-     }
- </style>
+        .m {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -35,8 +35,10 @@
                 <div class="myform form ">
                     <div class="logo mb-3">
                         <div class="col-md-12 text-center">
-                            <h2><th:block th:text="${book.getBookname()}"/></h2>
-                            <p id = "stars"></p>
+                            <h2>
+                                <th:block th:text="${book.getBookname()}"/>
+                            </h2>
+                            <p id="stars"></p>
                         </div>
                     </div>
 
@@ -54,18 +56,18 @@
 
 
     </div>
-    <div id="buttons" >
-    </div>
-    <div  style="margin-top: 20px" >
-        <form id="addComment" class="form-inline"  th:if="${#authorization.expression('isAuthenticated()')}">
 
+    <div style="margin-top: 20px">
+        <form id="addComment" class="form-inline" th:if="${#authorization.expression('isAuthenticated()')}">
+            <div id="buttons">
+            </div>
             <input name="comm" class="mym m form-control" placeholder="Comment">
             <select name="rat" class="mym m form-control">
-                <option value='1'> 1 </option>
-                <option value='2'> 2 </option>
-                <option value='3'> 3 </option>
-                <option value='4'> 4 </option>
-                <option value='5'> 5 </option>
+                <option value='1'> 1</option>
+                <option value='2'> 2</option>
+                <option value='3'> 3</option>
+                <option value='4'> 4</option>
+                <option value='5'> 5</option>
             </select>
             <button type="submit" class="btn m">Submit</button>
         </form>
@@ -84,7 +86,7 @@
 </div>
 
 <script>
-    var bookId, bookname, author, isbn, res=0, reviews=0;
+    var bookId, bookname, author, isbn, res = 0, reviews = 0;
 
     $(function () {
         $(document).ready(function () {
@@ -116,25 +118,25 @@
             });
             $.ajax({
                 type: 'GET',
-                url: 'comments/'+bookId,
+                url: 'comments/' + bookId,
                 success: function (response) {
                     var $table = $('#commentsTable');
                     $table.empty();
-                    reviews=0;
-                    res=0;
+                    reviews = 0;
+                    res = 0;
                     response.forEach(function (comment) {
-                        reviews++;
-                        res+=comment.stars;
+                            reviews++;
+                            res += comment.stars;
 
-                            $table.append('<tr><td>' + comment.user  + '</td><td>' + comment.stars + '</td><td>' +comment.text + '</td></tr>');
+                            $table.append('<tr><td>' + comment.user + '</td><td>' + comment.stars + '</td><td>' + comment.text + '</td></tr>');
                         }
                     )
-                    if(response.length<1){
-                        res=0;
+                    if (response.length < 1) {
+                        res = 0;
                     }
                     else
-                    res=Math.round(res/reviews*10)/10;
-                    $('#stars').text(res+"/5");
+                        res = Math.round(res / reviews * 10) / 10;
+                    $('#stars').text(res + "/5");
                 }
             });
         });
@@ -179,6 +181,7 @@
             }
         });
     }
+
     $('#addComment').submit(function (e) {
         e.preventDefault();
 
@@ -197,11 +200,11 @@
             success: function (comment) {
                 var $table = $('#commentsTable');
                 reviews++;
-                var dif = comment.stars-res;
-                res+=dif/reviews;
-                res=Math.round(res*10)/10;
-                $table.append('<tr><td>' + comment.user  + '</td><td>' + comment.stars + '</td><td>' +comment.text + '</td></tr>');
-                $('#stars').text(res+"/5");
+                var dif = comment.stars - res;
+                res += dif / reviews;
+                res = Math.round(res * 10) / 10;
+                $table.append('<tr><td>' + comment.user + '</td><td>' + comment.stars + '</td><td>' + comment.text + '</td></tr>');
+                $('#stars').text(res + "/5");
             }
         });
     });
